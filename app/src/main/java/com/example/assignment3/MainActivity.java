@@ -1,7 +1,7 @@
 package com.example.assignment3;
 
-//Wenquan Zhang 19023011
-//Yuekai Wu 13113181
+//Wenquan Zhang
+//Yuekai Wu
 //We develop a simple music player application for Android to play the music which are stored in the device.
 //It has a main menu to display the list of music files. The user can click on the music name, then the application will start the music play activity to play music
 //The music playing layout can display the music's name and its album picture. Also, there are three buttons: play/pause, last and next.
