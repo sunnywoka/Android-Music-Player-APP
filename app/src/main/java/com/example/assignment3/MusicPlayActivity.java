@@ -18,6 +18,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.util.Random;
+
 public class MusicPlayActivity extends AppCompatActivity {
 
     MusicPlayInterface musicPlayInterface;
@@ -25,13 +27,16 @@ public class MusicPlayActivity extends AppCompatActivity {
     MyServiceConnection myServiceConnection;
 
     //four button
-    private Button mButtonPlay, mButtonBack, mButtonNext, mButtonLast;
+    private Button mButtonPlay, mButtonBack, mButtonNext, mButtonLast, mButtonRandom;
 
     //music titles, paths and album cover
     String[] titles, paths;
     int pos, count;
     MediaMetadataRetriever mmr = new MediaMetadataRetriever();
     Bitmap cover;
+    boolean randomOn;
+
+    Random rand = new Random();
 
     //display the music playing progress
     private static SeekBar mSeekBar;
@@ -58,6 +63,9 @@ public class MusicPlayActivity extends AppCompatActivity {
         pos = getIntent().getIntExtra("Position", 0);
         count = getIntent().getIntExtra("MusicCount", 0);
 
+
+        randomOn = false;
+
         //start service
         startService(mIntent);
         //create service connection object
@@ -74,15 +82,19 @@ public class MusicPlayActivity extends AppCompatActivity {
         mButtonNext.setOnClickListener(View -> buttonClick(mButtonNext));
         mButtonLast = findViewById(R.id.buttonLast);
         mButtonLast.setOnClickListener(View -> buttonClick(mButtonLast));
+        mButtonRandom = findViewById(R.id.buttonRandom);
+        mButtonRandom.setOnClickListener(View -> buttonClick(mButtonRandom));
         mSeekBar = (SeekBar) findViewById(R.id.seekBar);
 
         //give seek bar a change listener
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) { }
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+            }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) { }
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
@@ -92,28 +104,44 @@ public class MusicPlayActivity extends AppCompatActivity {
             }
         });
     }
+
     //button click function to start other function
     private void buttonClick(Button b) {
         if (b.getText().equals("Play")) {//play music
             this.play(paths[pos], titles[pos]);
-        }else if(b.getText().equals("Pause")){//pause music
+        } else if (b.getText().equals("Pause")) {//pause music
             this.pause();
-        }else if(b.getText().equals("Continue")){//continue play music
+        } else if (b.getText().equals("Continue")) {//continue play music
             this.continuePlay();
-        }else if(b.getText().equals("Back")){//back main menu
+        } else if (b.getText().equals("Back")) {//back main menu
             this.back();
-        }else if(b.getText().equals("Next")){//next music
-            if (pos < count-1) {
+        } else if (b.getText().equals("Next")) {//next music
+            if ((pos < count - 1) && (!randomOn)) {
                 pos++;
                 this.play(paths[pos], titles[pos]);
+            } else if (randomOn) {
+                int int_random = rand.nextInt(count);
+                while (int_random == pos) {
+                    int_random = rand.nextInt(count);
+                }
+                pos = int_random;
+                this.play(paths[pos], titles[pos]);
             }
-        }else if (b.getText().equals("Last")){//last music
+        } else if (b.getText().equals("Last")) {
             if (pos > 0) {
                 pos--;
                 this.play(paths[pos], titles[pos]);
             }
+        } else if (b.getText().equals("Random")) {
+            mButtonRandom.setText("Off");
+            randomOn = true;
+        } else if (b.getText().equals("Off")) {
+            mButtonRandom.setText("Random");
+            randomOn = false;
         }
+
     }
+
 
     //Message handler object
     public static Handler handler = new Handler(){
